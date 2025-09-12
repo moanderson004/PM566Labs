@@ -1,0 +1,81 @@
+---
+title: "Lab3"
+format: html
+author: Mitchell Anderson
+embed-resources: true
+---
+```{r}
+##1
+met <- read.csv("~/Downloads/met_all.gz")
+```
+```{r}
+##2
+dim(met)
+head(met)
+tail(met)
+```
+```{r}
+##3
+str(met)
+```
+```{r}
+##4
+table(met$year)
+table(met$day)
+table(met$hour)
+summary(met$temp)
+summary(met$elev)
+summary(met$wind.sp)
+
+met$elev[met$elev==9999.0] <- NA
+summary(met$elev)
+#The highest point of elevation for a weather station is 4,113m
+met <- met[met$temp>-40, ]
+met2 <- met[order(met$temp), ]
+head(met2)
+```
+```{r}
+##5
+met$elev[which.min(met$temp)]
+range(met$elev, na.rm=TRUE)
+#removed temperatures colder than-15C
+met <- met[met$temp>-15, ]
+met2 <- met[order(met$temp), ]
+head(met2)
+```
+```{r}
+##6
+elev <- met[met$elev==max(met$elev, na.rm=TRUE), ]
+summary(elev)
+cor(elev$temp, elev$wind.sp, use="complete")
+cor(elev$temp, elev$hour, use="complete")
+cor(elev$wind.sp, elev$day, use="complete")
+cor(elev$wind.sp, elev$hour, use="complete")
+cor(elev$temp, elev$day, use="complete")
+```
+```{r}
+## 7----------------------------------------------------------------------
+hist(met$elev, breaks=100)
+hist(met$temp)
+hist(met$wind.sp)
+
+library(leaflet)
+leaflet(elev) %>%
+  addProviderTiles('OpenStreetMap') %>% 
+  addCircles(lat=~lat,lng=~lon, opacity=1, fillOpacity=1, radius=100)
+
+library(lubridate)
+elev$date <- with(elev, ymd_h(paste(year, month, day, hour, sep= ' ')))
+summary(elev$date)
+elev <- elev[order(elev$date), ]
+head(elev)
+
+plot(elev$date, elev$temp, type='l')
+plot(elev$date, elev$wind.sp, type='l')
+#One trend I see is the seemingly inverse relationship between wind and temperature
+```
+```{r}
+##8 
+#What is the correlation between temperature and wind 
+plot(met$temp,met$wind.sp)
+```
